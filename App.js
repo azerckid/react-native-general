@@ -1,14 +1,24 @@
 import AppLoading from "expo-app-loading";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useState, useEffect, useCallback } from "react";
-import { Text, Image, View } from "react-native";
+import { Text, Image, View, useColorScheme } from "react-native";
 
 import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
 import { Asset, useAssets } from "expo-asset";
 
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  DarkTheme,
+  DefaultTheme,
+} from "@react-navigation/native";
+
 import Tabs from "./navigation/Tabs";
+import Stack from "./navigation/Stack";
+import Root from "./navigation/Root";
+
+import { ThemeProvider } from "styled-components/native";
+import { darkTheme, lightTheme } from "./styled";
 
 const loadFonts = (fonts) => fonts.map((font) => Font.loadAsync(font));
 
@@ -21,12 +31,11 @@ const loadImages = (images) =>
     }
   });
 
-SplashScreen.preventAutoHideAsync();
-
 export default function App() {
   const [ready, setReady] = useState(false);
   // const [assets] = useAssets([require("./assets/splash_image.png")]);
   // const [loaded] = Font.useFonts(Ionicons.font);
+  const isDark = useColorScheme() === "dark";
 
   useEffect(() => {
     async function prepare() {
@@ -45,14 +54,16 @@ export default function App() {
   }, []);
 
   if (!ready) {
-    return null;
+    SplashScreen.preventAutoHideAsync();
   }
   if (ready) {
     SplashScreen.hideAsync();
     return (
-      <NavigationContainer>
-        <Tabs />
-      </NavigationContainer>
+      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+        <NavigationContainer>
+          <Root />
+        </NavigationContainer>
+      </ThemeProvider>
     );
   }
 }
